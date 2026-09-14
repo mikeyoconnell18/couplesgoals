@@ -1,0 +1,7 @@
+CODEX_BUILD_BRIEF.md
+supabase/**/*.sql
+.prettierrc
+app.json
+eas.json
+expo-env.d.ts
+tsconfig.json
