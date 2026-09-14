@@ -1,0 +1,8 @@
+-- Run with Supabase CLI after supplying fixture UUIDs in a disposable local project.
+-- Expected invariants:
+-- 1. SET LOCAL request.jwt.claim.sub to member A: their couple's goals are visible.
+-- 2. Set it to an unrelated user: those goals, check-ins, obligations, and events return zero rows.
+-- 3. A third active couple_members insert raises "at most two active members".
+-- 4. A member already active elsewhere violates one_active_couple_per_user.
+-- 5. INSERT/UPDATE/DELETE on subscriptions is denied to authenticated clients.
+-- 6. Storage policies (added with the photo-upload slice) must require the first path segment to be an active couple ID.
