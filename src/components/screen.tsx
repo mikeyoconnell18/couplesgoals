@@ -1,6 +1,50 @@
 import { PropsWithChildren } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { colors, spacing } from '@/theme/tokens';
-export function Screen({ title, eyebrow, children }: PropsWithChildren<{ title: string; eyebrow?: string }>) { return <SafeAreaView style={styles.safe}><ScrollView contentContainerStyle={styles.body}>{eyebrow && <Text style={styles.eyebrow}>{eyebrow}</Text>}<Text style={styles.title}>{title}</Text>{children}</ScrollView></SafeAreaView>; }
-export function Placeholder({ children }: PropsWithChildren) { return <View style={styles.placeholder}><Text style={styles.copy}>{children}</Text></View>; }
-const styles = StyleSheet.create({ safe: { flex: 1, backgroundColor: colors.cream }, body: { padding: spacing.lg, paddingBottom: 120 }, eyebrow: { color: colors.raspberry, fontWeight: '800', letterSpacing: 1.5, textTransform: 'uppercase', marginTop: spacing.md }, title: { color: colors.plum, fontSize: 34, lineHeight: 40, fontWeight: '800', marginTop: spacing.xs, marginBottom: spacing.lg }, placeholder: { backgroundColor: colors.surface, borderRadius: 24, padding: 24 }, copy: { color: colors.mutedPlum, fontSize: 16, lineHeight: 24 } });
+export function Screen({
+  title,
+  eyebrow,
+  children,
+}: PropsWithChildren<{ title: string; eyebrow?: string }>) {
+  return (
+    <SafeAreaView style={styles.safe}>
+      <ScrollView contentContainerStyle={styles.body}>
+        {eyebrow && <Text style={styles.eyebrow}>{eyebrow}</Text>}
+        <Text style={styles.title}>{title}</Text>
+        {children}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+export function Placeholder({ children }: PropsWithChildren) {
+  return (
+    <View style={styles.placeholder}>
+      <Text style={styles.copy}>{children}</Text>
+    </View>
+  );
+}
+const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: colors.cream },
+  body: { padding: spacing.lg, paddingBottom: 120 },
+  eyebrow: {
+    color: colors.raspberry,
+    fontWeight: '800',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+    marginTop: spacing.md,
+  },
+  title: {
+    color: colors.plum,
+    fontSize: 34,
+    lineHeight: 40,
+    fontWeight: '800',
+    marginTop: spacing.xs,
+    marginBottom: spacing.lg,
+  },
+  placeholder: {
+    backgroundColor: colors.surface,
+    borderRadius: 24,
+    padding: 24,
+  },
+  copy: { color: colors.mutedPlum, fontSize: 16, lineHeight: 24 },
+});
