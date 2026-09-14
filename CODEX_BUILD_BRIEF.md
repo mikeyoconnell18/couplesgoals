@@ -1,17 +1,18 @@
-# Couples Goals — Product and Codex Build Brief
+# Couple Goals — Product and Codex Build Brief
 
 Status: V1 definition  
-Working product name: Couples Goals  
+Working product name: Couple Goals  
 Platform: Mobile-first Expo / React Native  
 Repository: https://github.com/mikeyoconnell18/couplesgoals  
 Business model target: $4.99 per couple per month  
-Primary test users: Founding couple preparing for a Mexico trip
+Primary test users: Founding couple preparing for a Mexico trip  
+Naming status: Couple Goals is a working title and category descriptor; conduct a distinct brand-name search before public launch
 
 ---
 
 ## 1. Purpose of this document
 
-This is the canonical handoff for building Couples Goals. It captures the product thesis, V1 scope, goal system, consequence engine, engagement model, visual direction, data model, architecture, edge-case decisions, acceptance criteria, and the exact instructions a Codex coding workspace should follow.
+This is the canonical handoff for building Couple Goals. It captures the product thesis, V1 scope, goal system, consequence engine, engagement model, visual direction, data model, architecture, edge-case decisions, acceptance criteria, and the exact instructions a Codex coding workspace should follow.
 
 When implementation details conflict with this document, preserve the product principles first and choose the simplest technical solution that supports them.
 
@@ -19,7 +20,7 @@ When implementation details conflict with this document, preserve the product pr
 
 ## 2. Product thesis
 
-Couples Goals is a shared goals and accountability app for romantic partners.
+Couple Goals is a shared goals and accountability app for romantic partners.
 
 It helps two people work toward meaningful outcomes together, support one another's personal commitments, celebrate milestones, and use playful consequences or friendly bets to make consistency more exciting.
 
@@ -576,7 +577,7 @@ Reference: https://www.nirandfar.com/how-to-manufacture-desire/
 
 Use it as an interaction loop, not as permission to maximize compulsive use.
 
-### Couples Goals adaptation
+### Couple Goals adaptation
 
 #### Trigger
 
@@ -656,7 +657,7 @@ Self-Determination Theory highlights three psychological needs:
 
 Reference: https://selfdeterminationtheory.org/theory/
 
-Couples Goals should support all three:
+Couple Goals should support all three:
 
 - **Autonomy:** Everything is consensual and editable; users control goals, stakes, and notifications.
 - **Competence:** Progress, milestones, and Momentum show that effort is working.
@@ -676,7 +677,7 @@ With three health checks:
 - Does the interaction demonstrate competence?
 - Does it strengthen relatedness?
 
-This is better suited to Couples Goals than applying variable rewards mechanically.
+This is better suited to Couple Goals than applying variable rewards mechanically.
 
 ### 11.4 Ethical standard
 
@@ -833,6 +834,103 @@ Avoid:
 - Shame or guilt
 
 “Consequence” can be used in setup. “Owed,” “make it up,” or the actual obligation should be used in the everyday UI.
+
+---
+
+
+## 13A. Locked UI reference direction
+
+The approved product-design blend is:
+
+> Strava familiarity + Duolingo cooperative loops + Finch warmth + Paired relationship ritual
+
+The interface should feel familiar even when the palette and relationship mechanics feel new. Originality comes from the couple data, shared-goal visuals, writing, colors, rewards, and consequences—not novel navigation.
+
+### Four-tab navigation
+
+1. Today
+2. Goals
+3. Together
+4. Owed
+
+Settings live behind the profile/avatar control.
+
+### Today hierarchy
+
+1. Couple avatars, greeting, and nearest important end date
+2. Large Couple Momentum hero card
+3. Shared-goal progress cards
+4. Fast one-tap personal actions
+5. Partner Pulse with recent partner activity and lightweight reactions
+6. Nearest milestone or scheduled obligation
+
+### Signature Couple Momentum visual
+
+Use two visually distinct partner progress paths that merge into a shared result:
+
+- Raspberry for one partner
+- Teal for the other partner
+- Combined state for shared progress
+
+This should become the most recognizable visual element in the product.
+
+### Goal creation
+
+Use familiar templates plus Custom:
+
+- Build something together
+- Save for something
+- Shared habit
+- Personal goal
+- Friendly bet
+- Milestone plan
+- Custom
+
+Present creation as:
+
+1. The goal
+2. The plan
+3. Make it fun
+
+### Goal detail hierarchy
+
+1. Goal name, end date, and progress
+2. Partner contributions
+3. This week's actions
+4. Milestones
+5. Rewards and consequences
+6. Recent activity
+7. Historical periods
+
+### Together hierarchy
+
+1. Couple Momentum trend
+2. Shared streak
+3. Weekly Showdown
+4. Shared-goal highlights
+5. Milestones and celebrations
+6. Monthly consistency history
+7. Friendly competition results
+
+### Owed hierarchy
+
+Use two primary views:
+
+- You owe
+- Coming your way
+
+Obligation cards support scheduling, editing, completion, forgiveness, and dismissal without approval workflows.
+
+### Engagement mechanics approved for V1
+
+1. Couple Momentum plus Partner Pulse
+2. Weekly Showdown as the recurring couple ritual
+
+Do not add global leaderboards, public feeds, multiple point currencies, XP levels, cartoon mascots, dense analytics, or constant winner/loser framing.
+
+### Integration priority
+
+If one external activity integration is added after the manual core loop, prioritize Strava before Apple Health. Keep manual logging first-class because shared goals also include savings, travel, dates, household projects, and relationship actions.
 
 ---
 
@@ -1552,7 +1650,7 @@ If a package or API has changed:
 Copy this into the Codex coding workspace after opening the repository:
 
 ~~~
-You are building Couples Goals in this repository.
+You are building Couple Goals in this repository.
 
 First, read CODEX_BUILD_BRIEF.md completely. Treat it as the canonical product and technical specification. Inspect the repository and any AGENTS.md files before editing.
 
@@ -1619,7 +1717,7 @@ Start by:
 
 The first meaningful real-world test is not whether the screens look finished.
 
-It is whether the founding couple can use Couples Goals during Mexico preparation and naturally complete this loop:
+It is whether the founding couple can use Couple Goals during Mexico preparation and naturally complete this loop:
 
 > Define something meaningful together → take small actions → see shared progress → experience a celebration or playful consequence → invest in the next goal.
 
