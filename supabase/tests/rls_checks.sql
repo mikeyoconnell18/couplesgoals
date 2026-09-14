@@ -6,3 +6,14 @@
 -- 4. A member already active elsewhere violates one_active_couple_per_user.
 -- 5. INSERT/UPDATE/DELETE on subscriptions is denied to authenticated clients.
 -- 6. Storage policies (added with the photo-upload slice) must require the first path segment to be an active couple ID.
+
+-- Two-person slice checks (run locally with representative JWTs):
+-- 1. User A calls create_couple_with_membership; assert one membership and no direct anonymous invite lookup.
+-- 2. User B calls join_couple_by_invite_code; assert two memberships and invite_used_at is set.
+-- 3. User C repeats the call; assert used/full error and no membership.
+-- 4. User A attempts a second create/join; assert unique active membership failure.
+-- 5. Insert the same (action_id,user_id,effective_local_date) twice; assert the partial unique index rejects duplication.
+-- 6. Reconcile a closed missed week twice; assert one generation_key and one obligation.
+-- 7. As an unrelated couple member, select/update each captured goal, action, check-in, rule, result,
+--    obligation, and event UUID; assert zero visible/affected rows.
+-- 8. Confirm both members can edit their couple goal/rule/obligation and only the logging user can insert their check-in.

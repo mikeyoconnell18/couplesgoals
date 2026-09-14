@@ -1,38 +1,55 @@
 # Couples Goals
 
-A mobile-first Expo app for couples to build shared momentum through meaningful goals, tiny actions, celebrations, and playful stakes. The current vertical slice is a credential-free Mexico preparation dashboard: quick logging updates the shared Momentum score immediately.
+A mobile-first Expo app for two partners to build shared momentum through goals, fast honor-system check-ins, Weekly Showdowns, and playful consequences. The Mexico sample remains available without credentials.
 
-## Included foundation
+> The requested baseline is Expo SDK 57. Confirm `package.json` and run `npx expo-doctor@latest` after installing; this workspace could not access npm or the remote SDK-upgrade branch, so dependency verification remains required before release.
 
-- Expo Router tabs for Today, Goals, Together, Owed, and Profile
-- Warm cream, raspberry, plum, coral, teal, and lime theme
-- Pure recurrence and Couple Momentum domain functions with tests
-- Typed Supabase environment boundary that leaves demo mode available without credentials
-- Initial Postgres model, couple-scoped RLS, two-person membership enforcement, and Mexico seed helper
-- EAS build profiles; paywall remains disabled
+## Requirements
 
-## Local setup
+- Node.js 22 LTS and npm
+- Current Expo Go, Xcode/iOS Simulator, or Android Studio
+- Supabase CLI for local/CLI database setup
+- EAS CLI and Expo account only for cloud builds
 
-Prerequisites: Node 22+, npm, and (for backend work) the Supabase CLI.
+## Install and run
 
 ```sh
 npm install
-cp .env.example .env.local
 npm start
 ```
 
-The app intentionally runs its first slice from local demo state if Supabase variables are absent. For a connected project, place the public project URL and anon key in `.env.local`. Never place a service-role key in the app.
+Press `i`, `a`, or `w` in Expo for iOS, Android, or web. Equivalent commands are `npm run ios`, `npm run android`, and `npm run web`. Export the web app with `npx expo export --platform web`.
 
-## Supabase
+## Demo mode
+
+Leave both Supabase variables unset. The app clearly labels Demo mode, loads the Mexico sample, supports local check-ins, and never claims they are synchronized. Use **Profile → Reset demo** to restore sample state. Demo data is intentionally in memory; real-mode data persists in Postgres.
+
+## Real two-person mode
+
+Copy the environment template and use only Supabase's public client values:
 
 ```sh
-supabase start
-supabase db reset
+cp .env.example .env.local
+# EXPO_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+# EXPO_PUBLIC_SUPABASE_ANON_KEY=YOUR_PUBLIC_ANON_KEY
+npm start -- --clear
 ```
 
-Create two Auth users and their `profiles`, create a couple and memberships, then call `select public.seed_mexico_demo('<couple-id>', '<creator-user-id>');` locally. `supabase/seed.sql` installs that helper during reset. The schema stores timestamps as `timestamptz` and one shared IANA time zone on each couple.
+The client never uses a service-role key. Follow [SUPABASE_SETUP.md](SUPABASE_SETUP.md) to create the project, apply migrations, configure email OTP and redirect URLs, enable Realtime, and verify RLS. When configured, authentication errors are shown; the app does not silently fall back to demo mode.
 
-RLS checks are documented in `supabase/tests/rls_checks.sql`. Photo storage policies are deliberately deferred until the photo-upload slice creates a bucket.
+## Database migrations
+
+```sh
+supabase login
+supabase link --project-ref YOUR_PROJECT_REF
+supabase db push
+```
+
+For local Supabase use `supabase start` followed by `supabase db reset`. Migrations are append-only: the two-person slice extends the foundation with atomic pairing RPCs, idempotency constraints, weekly history, reconciliation, indexes, and Realtime publication entries.
+
+## Test two accounts
+
+Follow [MANUAL_TWO_USER_TEST.md](MANUAL_TWO_USER_TEST.md) with two devices or isolated browsers. It covers pairing, realtime goal/check-in updates, Momentum, reconciliation, fulfillment, persistence, and cross-couple isolation.
 
 ## Checks
 
@@ -41,15 +58,9 @@ npm test
 npm run typecheck
 npm run lint
 npm run format:check
+npx expo-doctor@latest
 ```
 
-## Credential-dependent next steps
+## EAS builds
 
-- Link a Supabase project and configure Auth redirect URLs for `couplesgoals://`.
-- Add generated database types after the first remote migration.
-- Configure notification credentials when reminders are implemented.
-- Add RevenueCat public SDK keys when subscriptions are implemented; the paywall flag stays `false` during internal testing.
-
-## Next vertical slices
-
-Authentication and secure invite acceptance come next, followed by persisted goal/action/check-in editing. Consequence evaluation, competitions, obligations, Weekly Showdown, notifications, and subscriptions follow the sequence in `CODEX_BUILD_BRIEF.md`.
+Install and authenticate EAS CLI, configure the public environment variables as EAS environment variables, verify unique bundle/package identifiers in `app.json`, then run `eas build --platform ios` or `eas build --platform android`. Apple and Google developer accounts are required for store builds. Never add secret server credentials to an EAS client build.
