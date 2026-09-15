@@ -18,7 +18,10 @@ export default function Owed() {
     );
   const name = (id: string | null) =>
     members.find((m) => m.user_id === id)?.profiles?.display_name ?? 'Partner';
-  async function update(id: string, status: 'completed' | 'forgiven') {
+  async function update(
+    id: string,
+    status: 'completed' | 'forgiven' | 'dismissed',
+  ) {
     const client = getSupabaseClient();
     if (!client) return;
     const { error } = await client
@@ -41,6 +44,12 @@ export default function Owed() {
             <Text style={styles.title}>{item.title}</Text>
             <View style={styles.row}>
               <Pressable
+                onPress={() => void update(item.id, 'dismissed')}
+                style={styles.link}
+              >
+                <Text style={styles.linkText}>Dismiss</Text>
+              </Pressable>
+              <Pressable
                 onPress={() => void update(item.id, 'forgiven')}
                 style={styles.link}
               >
@@ -57,8 +66,8 @@ export default function Owed() {
         ))
       ) : (
         <Placeholder>
-          You're all squared up. Any future make-it-ups will appear here for
-          both partners.
+          You&apos;re all squared up. Any future make-it-ups will appear here
+          for both partners.
         </Placeholder>
       )}
     </Screen>

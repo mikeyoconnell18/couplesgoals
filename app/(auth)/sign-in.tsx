@@ -28,8 +28,8 @@ export default function SignIn() {
   return (
     <Screen eyebrow="Couples Goals" title="Build it together.">
       <Text style={styles.copy}>
-        Enter your email and we'll send a one-time sign-in code. No password
-        needed.
+        Enter your email and we&apos;ll send a one-time sign-in code. No
+        password needed.
       </Text>
       <Text style={styles.label}>EMAIL</Text>
       <TextInput

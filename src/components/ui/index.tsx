@@ -1,4 +1,4 @@
-import { PropsWithChildren, ReactNode, useState } from 'react';
+import { PropsWithChildren, ReactNode } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
