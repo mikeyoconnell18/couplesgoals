@@ -17,3 +17,9 @@
 -- 7. As an unrelated couple member, select/update each captured goal, action, check-in, rule, result,
 --    obligation, and event UUID; assert zero visible/affected rows.
 -- 8. Confirm both members can edit their couple goal/rule/obligation and only the logging user can insert their check-in.
+
+-- Connected experience verification:
+-- 9. As member A, add/update/delete A's reaction and comment; assert unique(activity_event_id,user_id).
+-- 10. As member B, read both; assert B cannot update/delete A's rows. As outsider C, assert neither row is visible.
+-- 11. Insert an activity as A; assert only B receives a notification. Assert A cannot select or mark B's notification read.
+-- 12. Verify activity_event_id/couple_id and goal_id/couple_id composite FKs reject cross-couple attachment.

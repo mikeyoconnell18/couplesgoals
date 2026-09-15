@@ -97,9 +97,9 @@ export default function GoalDetail() {
   );
 }
 const styles = StyleSheet.create({
-  copy: { color: colors.mutedPlum },
+  copy: { color: colors.textSecondary },
   label: {
-    color: colors.plum,
+    color: colors.ink,
     fontSize: 11,
     fontWeight: '900',
     marginTop: spacing.md,
@@ -108,29 +108,29 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.line,
+    borderColor: colors.border,
     borderRadius: radius.md,
     padding: spacing.md,
     fontSize: 16,
-    color: colors.plum,
+    color: colors.ink,
   },
   multiline: { minHeight: 100, textAlignVertical: 'top' },
   heading: {
-    color: colors.plum,
+    color: colors.ink,
     fontSize: 19,
     fontWeight: '900',
     marginTop: spacing.xl,
   },
   action: {
-    backgroundColor: colors.peach,
+    backgroundColor: colors.elevated,
     padding: spacing.md,
     borderRadius: radius.sm,
     marginTop: spacing.sm,
-    color: colors.plum,
+    color: colors.ink,
   },
   error: { color: colors.raspberry, marginTop: spacing.md },
   save: {
-    backgroundColor: colors.raspberry,
+    backgroundColor: colors.primary,
     padding: 17,
     borderRadius: radius.md,
     alignItems: 'center',
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
   saveText: { color: 'white', fontWeight: '900' },
   secondary: {
     borderWidth: 1,
-    borderColor: colors.raspberry,
+    borderColor: colors.primary,
     padding: 15,
     borderRadius: radius.md,
     alignItems: 'center',

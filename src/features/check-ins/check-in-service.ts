@@ -30,6 +30,14 @@ export async function logCheckIn(input: CheckInInput) {
     .select()
     .single();
   if (error) throw error;
+  await client.from('activity_events').insert({
+    couple_id: input.coupleId,
+    actor_user_id: input.userId,
+    event_type: 'check_in_created',
+    entity_type: 'check_in',
+    entity_id: data.id,
+    summary: `Logged progress${input.note ? ` — ${input.note}` : ''}`,
+  });
   return data;
 }
 export async function undoCheckIn(id: string) {

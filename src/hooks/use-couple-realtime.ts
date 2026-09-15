@@ -7,6 +7,9 @@ const TABLES = [
   'check_ins',
   'obligations',
   'activity_events',
+  'activity_reactions',
+  'activity_comments',
+  'in_app_notifications',
 ] as const;
 export function useCoupleRealtime(
   coupleId: string | undefined,

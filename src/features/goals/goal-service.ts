@@ -37,6 +37,16 @@ export async function createGoal(draft: GoalDraft, userId: string) {
     .select()
     .single();
   if (error) throw error;
+  await client()
+    .from('activity_events')
+    .insert({
+      couple_id: draft.coupleId,
+      actor_user_id: userId,
+      event_type: 'goal_created',
+      entity_type: 'goal',
+      entity_id: data.id,
+      summary: `Created ${draft.title}`,
+    });
   return data;
 }
 export async function updateGoal(

@@ -140,7 +140,7 @@ function Field({
 }
 const styles = StyleSheet.create({
   label: {
-    color: colors.plum,
+    color: colors.ink,
     fontSize: 11,
     fontWeight: '900',
     marginTop: spacing.md,
@@ -149,23 +149,23 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.line,
+    borderColor: colors.border,
     borderRadius: radius.md,
     padding: spacing.md,
     fontSize: 16,
-    color: colors.plum,
+    color: colors.ink,
   },
   button: {
     marginTop: spacing.xl,
     padding: 17,
     borderRadius: radius.md,
-    backgroundColor: colors.raspberry,
+    backgroundColor: colors.primary,
     alignItems: 'center',
   },
   buttonText: { color: 'white', fontWeight: '900' },
   error: { color: colors.raspberry, marginTop: spacing.sm },
   hint: {
-    color: colors.mutedPlum,
+    color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.sm,
     fontSize: 12,

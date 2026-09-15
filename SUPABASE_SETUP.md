@@ -47,7 +47,7 @@ Open **SQL Editor → New query**. Run every file in `supabase/migrations` in fi
 
 ## 5. Realtime
 
-The migration adds `goals`, `actions`, `check_ins`, `obligations`, and `activity_events` to `supabase_realtime`. Confirm them under **Database → Publications → supabase_realtime**. Do not expose tables by disabling RLS.
+The migrations add `goals`, `actions`, `check_ins`, `obligations`, `activity_events`, `activity_reactions`, `activity_comments`, and `in_app_notifications` to `supabase_realtime`. Confirm them under **Database → Publications → supabase_realtime**. The connected tables retain RLS: couple members can read shared reactions/comments, authors alone can change or delete their own content, and only recipients can read or update notifications. Do not expose tables by disabling RLS.
 
 ## 6. Verify RLS and two-user behavior
 

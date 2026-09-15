@@ -101,7 +101,7 @@ export default function Onboarding() {
 }
 const styles = StyleSheet.create({
   label: {
-    color: colors.plum,
+    color: colors.ink,
     fontSize: 11,
     fontWeight: '900',
     marginTop: spacing.md,
@@ -110,18 +110,18 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.line,
+    borderColor: colors.border,
     borderRadius: radius.md,
     padding: spacing.md,
     fontSize: 16,
-    color: colors.plum,
+    color: colors.ink,
   },
   choices: { marginTop: spacing.xl, gap: spacing.sm },
   primary: {
     marginTop: spacing.md,
     padding: 17,
     borderRadius: radius.md,
-    backgroundColor: colors.raspberry,
+    backgroundColor: colors.primary,
     alignItems: 'center',
   },
   primaryText: { color: 'white', fontWeight: '900', fontSize: 16 },
@@ -129,14 +129,14 @@ const styles = StyleSheet.create({
     padding: 17,
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: colors.raspberry,
+    borderColor: colors.primary,
     alignItems: 'center',
   },
   secondaryText: { color: colors.raspberry, fontWeight: '900' },
   error: { color: colors.raspberry, marginTop: 8 },
   back: {
     textAlign: 'center',
-    color: colors.mutedPlum,
+    color: colors.textSecondary,
     marginTop: spacing.md,
     fontWeight: '700',
   },

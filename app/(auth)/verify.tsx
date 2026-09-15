@@ -43,24 +43,24 @@ export default function Verify() {
   );
 }
 const styles = StyleSheet.create({
-  copy: { color: colors.mutedPlum, fontSize: 16 },
+  copy: { color: colors.textSecondary, fontSize: 16 },
   input: {
     marginTop: spacing.lg,
     backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.line,
+    borderColor: colors.border,
     borderRadius: radius.md,
     padding: spacing.md,
     fontSize: 24,
     letterSpacing: 5,
-    color: colors.plum,
+    color: colors.ink,
   },
   error: { color: colors.raspberry, marginTop: 8 },
   button: {
     marginTop: spacing.md,
     padding: 17,
     borderRadius: radius.md,
-    backgroundColor: colors.raspberry,
+    backgroundColor: colors.primary,
     alignItems: 'center',
   },
   buttonText: { color: 'white', fontWeight: '900', fontSize: 16 },
