@@ -5,3 +5,5 @@ app.json
 eas.json
 expo-env.d.ts
 tsconfig.json
+
+src/domain/recurrence.ts

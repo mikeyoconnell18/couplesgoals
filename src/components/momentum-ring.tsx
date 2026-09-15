@@ -1,27 +1,28 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { colors } from '@/theme/tokens';
+import { colors, type } from '@/theme/tokens';
 export function MomentumRing({ value }: { value: number }) {
   return (
     <View
-      accessibilityLabel={`Couple Momentum ${value} percent`}
-      style={styles.ring}
+      accessibilityRole="progressbar"
+      accessibilityValue={{ min: 0, max: 100, now: value }}
+      style={s.ring}
     >
-      <Text style={styles.value}>{value}%</Text>
-      <Text style={styles.label}>Momentum</Text>
+      <Text style={s.value}>{value}</Text>
+      <Text style={s.label}>Momentum</Text>
     </View>
   );
 }
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   ring: {
-    width: 146,
-    height: 146,
-    borderRadius: 73,
-    borderWidth: 14,
-    borderColor: colors.lime,
+    width: 108,
+    height: 108,
+    borderRadius: 54,
+    borderWidth: 7,
+    borderColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.surface,
   },
-  value: { fontSize: 34, fontWeight: '900', color: colors.plum },
-  label: { color: colors.teal, fontWeight: '700' },
+  value: { fontSize: 28, fontWeight: '800', color: colors.ink },
+  label: { ...type.label, color: colors.textSecondary },
 });

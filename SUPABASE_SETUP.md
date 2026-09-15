@@ -38,6 +38,8 @@ For a local backend, use `supabase start` and `supabase db reset` instead.
 
 Open **SQL Editor → New query**. Run every file in `supabase/migrations` in filename order. Run each entire file once. The second migration adds atomic invite RPCs, idempotency constraints, indexes, weekly results, and Realtime tables.
 
+The action-participation migration defaults existing assigned actions to individual and existing unassigned actions to joint. Review those defaults after migration if an older shared action was intended to be completed separately by both partners.
+
 ## 4. Configure passwordless email
 
 1. Open **Authentication → Providers → Email** and enable Email plus email OTP.
@@ -47,7 +49,7 @@ Open **SQL Editor → New query**. Run every file in `supabase/migrations` in fi
 
 ## 5. Realtime
 
-The migration adds `goals`, `actions`, `check_ins`, `obligations`, and `activity_events` to `supabase_realtime`. Confirm them under **Database → Publications → supabase_realtime**. Do not expose tables by disabling RLS.
+The migrations add `goals`, `actions`, `check_ins`, `obligations`, `activity_events`, `activity_reactions`, `activity_comments`, and `in_app_notifications` to `supabase_realtime`. Confirm them under **Database → Publications → supabase_realtime**. The connected tables retain RLS: couple members can read shared reactions/comments, authors alone can change or delete their own content, and only recipients can read or update notifications. Do not expose tables by disabling RLS.
 
 ## 6. Verify RLS and two-user behavior
 

@@ -18,7 +18,7 @@ export default function Together() {
 }
 const styles = StyleSheet.create({
   heading: {
-    color: colors.plum,
+    color: colors.ink,
     fontSize: 22,
     fontWeight: '800',
     marginVertical: 20,

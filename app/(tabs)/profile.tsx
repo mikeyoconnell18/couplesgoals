@@ -91,14 +91,14 @@ export default function Profile() {
 }
 const styles = StyleSheet.create({
   mode: {
-    backgroundColor: colors.peach,
+    backgroundColor: colors.elevated,
     padding: spacing.lg,
     borderRadius: radius.md,
   },
-  modeTitle: { color: colors.plum, fontWeight: '900', fontSize: 17 },
-  copy: { color: colors.mutedPlum, lineHeight: 20, marginTop: 5 },
+  modeTitle: { color: colors.ink, fontWeight: '900', fontSize: 17 },
+  copy: { color: colors.textSecondary, lineHeight: 20, marginTop: 5 },
   heading: {
-    color: colors.plum,
+    color: colors.ink,
     fontWeight: '900',
     fontSize: 19,
     marginTop: spacing.xl,
@@ -116,9 +116,9 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 1,
   },
-  item: { color: colors.plum, fontSize: 16, fontWeight: '700' },
+  item: { color: colors.ink, fontSize: 16, fontWeight: '700' },
   code: {
-    color: colors.teal,
+    color: colors.primary,
     fontWeight: '900',
     fontSize: 25,
     letterSpacing: 3,
@@ -127,11 +127,15 @@ const styles = StyleSheet.create({
   actions: { gap: spacing.md, marginTop: spacing.xl },
   outline: {
     borderWidth: 1,
-    borderColor: colors.raspberry,
+    borderColor: colors.primary,
     borderRadius: radius.md,
     padding: 15,
     alignItems: 'center',
   },
   outlineText: { color: colors.raspberry, fontWeight: '900' },
-  placeholder: { color: colors.mutedPlum, textAlign: 'center', fontSize: 12 },
+  placeholder: {
+    color: colors.textSecondary,
+    textAlign: 'center',
+    fontSize: 12,
+  },
 });

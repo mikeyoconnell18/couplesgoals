@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   calculateMomentum,
+  explainMomentumChange,
   extendsMomentumStreak,
 } from '../../src/domain/momentum.ts';
 
@@ -48,4 +49,51 @@ test('does not double-count a competition based on an included action', () =>
 test('uses the 70 percent streak threshold', () => {
   assert.equal(extendsMomentumStreak(70), true);
   assert.equal(extendsMomentumStreak(69), false);
+});
+
+test('joint work counts once while parallel work counts each partner separately', () => {
+  const score = calculateMomentum([
+    {
+      id: 'planning',
+      progress: 1,
+      target: 1,
+      contributesToMomentum: true,
+      participationMode: 'joint',
+      participantUserId: 'a',
+    },
+    {
+      id: 'planning',
+      progress: 1,
+      target: 1,
+      contributesToMomentum: true,
+      participationMode: 'joint',
+      participantUserId: 'b',
+    },
+    {
+      id: 'workout',
+      progress: 4,
+      target: 4,
+      contributesToMomentum: true,
+      participationMode: 'parallel',
+      participantUserId: 'a',
+    },
+    {
+      id: 'workout',
+      progress: 2,
+      target: 4,
+      contributesToMomentum: true,
+      participationMode: 'parallel',
+      participantUserId: 'b',
+    },
+  ]);
+  assert.equal(score, 83);
+});
+
+test('momentum explanation names the partner and action', () => {
+  assert.equal(
+    explainMomentumChange(6, [
+      { personName: 'Taylor', actionTitle: 'her workout', shared: false },
+    ]),
+    'Up 6 this week — Taylor completed her workout.',
+  );
 });

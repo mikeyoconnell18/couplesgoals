@@ -7,6 +7,13 @@ import {
   useState,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  ActivityComment,
+  ActivityEvent,
+  InAppNotification,
+  loadConnected,
+  Reaction,
+} from '@/features/connected/connected-service';
 import { useAuth } from '@/features/auth/auth-context';
 import { useCoupleRealtime } from '@/hooks/use-couple-realtime';
 import { getSupabaseClient } from '@/lib/supabase';
@@ -42,6 +49,8 @@ export type ActionRecord = {
   cadence_type: string;
   target_value: number;
   metric_type: string;
+  participation_mode: 'individual' | 'joint' | 'parallel';
+  accountability_user_id: string | null;
 };
 export type CheckInRecord = {
   id: string;
@@ -67,6 +76,10 @@ type State = {
   actions: ActionRecord[];
   checkIns: CheckInRecord[];
   obligations: ObligationRecord[];
+  events: ActivityEvent[];
+  reactions: Reaction[];
+  comments: ActivityComment[];
+  notifications: InAppNotification[];
   loading: boolean;
   error?: string;
   refresh(): Promise<void>;
@@ -80,6 +93,10 @@ export function CoupleDataProvider({ children }: PropsWithChildren) {
     actions: [],
     checkIns: [],
     obligations: [],
+    events: [],
+    reactions: [],
+    comments: [],
+    notifications: [],
     loading: !isDemo,
   });
   const refresh = useCallback(async () => {
@@ -101,6 +118,10 @@ export function CoupleDataProvider({ children }: PropsWithChildren) {
           actions: [],
           checkIns: [],
           obligations: [],
+          events: [],
+          reactions: [],
+          comments: [],
+          notifications: [],
           loading: false,
         });
         return;
@@ -153,6 +174,7 @@ export function CoupleDataProvider({ children }: PropsWithChildren) {
       ].find((item) => item.error)?.error;
       if (failure) throw failure;
       const goals = (goalsResult.data ?? []) as GoalRecord[];
+      const connected = await loadConnected(coupleId, session.user.id);
       let actions: ActionRecord[] = [];
       if (goals.length) {
         const result = await client
@@ -175,6 +197,7 @@ export function CoupleDataProvider({ children }: PropsWithChildren) {
         checkIns: (checkInsResult.data ?? []) as CheckInRecord[],
         obligations: (obligationsResult.data ?? []) as ObligationRecord[],
         loading: false,
+        ...connected,
       };
       setState(nextState);
       await AsyncStorage.setItem(

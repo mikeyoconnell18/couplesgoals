@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, TextInput } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Screen } from '@/components/screen';
 import { useAuth } from '@/features/auth/auth-context';
 import { useCoupleData } from '@/features/data/couple-data-context';
@@ -17,6 +17,9 @@ export default function NewGoal() {
   const [action, setAction] = useState('');
   const [target, setTarget] = useState('1');
   const [consequence, setConsequence] = useState('');
+  const [who, setWho] = useState<'me' | 'partner' | 'joint' | 'parallel'>(
+    'joint',
+  );
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   async function save() {
@@ -44,6 +47,26 @@ export default function NewGoal() {
         cadence: 'weekly',
         target: Number(target),
         startDate: today,
+        participationMode:
+          who === 'joint'
+            ? 'joint'
+            : who === 'parallel'
+              ? 'parallel'
+              : 'individual',
+        assignedUserId:
+          who === 'me'
+            ? session.user.id
+            : who === 'partner'
+              ? members.find((member) => member.user_id !== session.user.id)
+                  ?.user_id
+              : undefined,
+        accountabilityUserId:
+          who === 'me'
+            ? members.find((member) => member.user_id !== session.user.id)
+                ?.user_id
+            : who === 'partner'
+              ? session.user.id
+              : undefined,
       });
       if (consequence.trim())
         await addConsequence(
@@ -83,6 +106,56 @@ export default function NewGoal() {
         onChange={setAction}
         placeholder="Complete a workout"
       />
+      <Text style={styles.label}>Who’s doing this?</Text>
+      <View style={styles.choices}>
+        {(
+          [
+            [
+              'me',
+              members.find((member) => member.user_id === session?.user.id)
+                ?.profiles?.display_name ?? 'Me',
+            ],
+            [
+              'partner',
+              members.find((member) => member.user_id !== session?.user.id)
+                ?.profiles?.display_name ?? 'My partner',
+            ],
+            [
+              'joint',
+              `${
+                members
+                  .map((member) => member.profiles?.display_name)
+                  .filter(Boolean)
+                  .join(' + ') || 'Both of us'
+              } together`,
+            ],
+            [
+              'parallel',
+              `${
+                members
+                  .map((member) => member.profiles?.display_name)
+                  .filter(Boolean)
+                  .join(' and ') || 'Each of us'
+              } separately`,
+            ],
+          ] as const
+        ).map(([value, label]) => (
+          <Pressable
+            key={value}
+            onPress={() => setWho(value)}
+            style={[styles.choice, who === value && styles.choiceSelected]}
+          >
+            <Text
+              style={[
+                styles.choiceText,
+                who === value && styles.choiceTextSelected,
+              ]}
+            >
+              {label}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
       <Field
         label="WEEKLY TARGET"
         value={target}
@@ -140,7 +213,7 @@ function Field({
 }
 const styles = StyleSheet.create({
   label: {
-    color: colors.plum,
+    color: colors.ink,
     fontSize: 11,
     fontWeight: '900',
     marginTop: spacing.md,
@@ -149,25 +222,41 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.line,
+    borderColor: colors.border,
     borderRadius: radius.md,
     padding: spacing.md,
     fontSize: 16,
-    color: colors.plum,
+    color: colors.ink,
   },
   button: {
     marginTop: spacing.xl,
     padding: 17,
     borderRadius: radius.md,
-    backgroundColor: colors.raspberry,
+    backgroundColor: colors.primary,
     alignItems: 'center',
   },
   buttonText: { color: 'white', fontWeight: '900' },
   error: { color: colors.raspberry, marginTop: spacing.sm },
   hint: {
-    color: colors.mutedPlum,
+    color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.sm,
     fontSize: 12,
   },
+  choices: { gap: spacing.xs, marginBottom: spacing.md },
+  choice: {
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+  },
+  choiceSelected: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primarySoft,
+  },
+  choiceText: { color: colors.textSecondary, fontWeight: '600' },
+  choiceTextSelected: { color: colors.primary },
 });

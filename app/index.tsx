@@ -11,7 +11,7 @@ export default function Index() {
           flex: 1,
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: colors.cream,
+          backgroundColor: colors.background,
         }}
       >
         <ActivityIndicator color={colors.raspberry} />
