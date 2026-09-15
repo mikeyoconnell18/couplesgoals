@@ -61,9 +61,9 @@ export default function SignIn() {
   );
 }
 const styles = StyleSheet.create({
-  copy: { color: colors.mutedPlum, fontSize: 16, lineHeight: 23 },
+  copy: { color: colors.textSecondary, fontSize: 16, lineHeight: 23 },
   label: {
-    color: colors.plum,
+    color: colors.ink,
     fontSize: 11,
     fontWeight: '900',
     marginTop: spacing.xl,
@@ -72,18 +72,18 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.line,
+    borderColor: colors.border,
     borderRadius: radius.md,
     padding: spacing.md,
     fontSize: 16,
-    color: colors.plum,
+    color: colors.ink,
   },
   error: { color: colors.raspberry, marginTop: 8 },
   button: {
     marginTop: spacing.md,
     padding: 17,
     borderRadius: radius.md,
-    backgroundColor: colors.raspberry,
+    backgroundColor: colors.primary,
     alignItems: 'center',
   },
   buttonText: { color: 'white', fontWeight: '900', fontSize: 16 },
@@ -91,6 +91,6 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
     padding: spacing.md,
     borderRadius: radius.md,
-    backgroundColor: colors.peach,
+    backgroundColor: colors.elevated,
   },
 });

@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   title: {
-    color: colors.plum,
+    color: colors.ink,
     fontWeight: '800',
     fontSize: 19,
     marginVertical: spacing.sm,
@@ -90,7 +90,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   link: { padding: 10 },
-  linkText: { color: colors.mutedPlum, fontWeight: '700' },
-  done: { backgroundColor: colors.teal, borderRadius: radius.sm, padding: 12 },
+  linkText: { color: colors.textSecondary, fontWeight: '700' },
+  done: {
+    backgroundColor: colors.primary,
+    borderRadius: radius.sm,
+    padding: 12,
+  },
   doneText: { color: 'white', fontWeight: '900' },
 });

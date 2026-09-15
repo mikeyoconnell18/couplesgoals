@@ -2,6 +2,10 @@
 
 A mobile-first Expo app for two partners to build shared momentum through goals, fast honor-system check-ins, Weekly Showdowns, and playful consequences. The Mexico sample remains available without credentials.
 
+The connected experience also includes contextual activity reactions and comments, lightweight couple notes, and an in-app notification center. These are deliberately scoped to shared goal activity rather than general messaging.
+
+Actions explicitly support **individual** work with an accountability partner, one **joint** completion logged by either person, and **parallel** progress tracked separately for both partners. The UI describes these as “Who’s doing this?” rather than exposing database terminology.
+
 > The requested baseline is Expo SDK 57. Confirm `package.json` and run `npx expo-doctor@latest` after installing; this workspace could not access npm or the remote SDK-upgrade branch, so dependency verification remains required before release.
 
 ## Requirements
@@ -45,7 +49,7 @@ supabase link --project-ref YOUR_PROJECT_REF
 supabase db push
 ```
 
-For local Supabase use `supabase start` followed by `supabase db reset`. Migrations are append-only: the two-person slice extends the foundation with atomic pairing RPCs, idempotency constraints, weekly history, reconciliation, indexes, and Realtime publication entries.
+For local Supabase use `supabase start` followed by `supabase db reset`. Migrations are append-only: the two-person slice extends the foundation with atomic pairing RPCs, idempotency constraints, weekly history, reconciliation, indexes, and Realtime publication entries. `20260914220000_connected_experience.sql` adds couple-scoped reactions, contextual comments, in-app notifications, notification triggers, RLS, and their Realtime publication entries. `20260915200000_action_participation.sql` safely classifies existing actions, adds individual accountability, enforces one joint occurrence, and keeps parallel check-ins separate per partner.
 
 ## Test two accounts
 

@@ -1,77 +1,122 @@
-import { Placeholder, Screen } from '@/components/screen';
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
+import {
+  AppScreen,
+  EmptyState,
+  GoalCard,
+  PrimaryButton,
+  SectionHeader,
+} from '@/components/ui';
 import { useAuth } from '@/features/auth/auth-context';
 import { useCoupleData } from '@/features/data/couple-data-context';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { useDemo } from '@/features/demo/demo-context';
+import { colors, spacing, type } from '@/theme/tokens';
 export default function Goals() {
   const { isDemo } = useAuth();
-  const { goals } = useCoupleData();
-  if (isDemo)
-    return (
-      <Screen eyebrow="Our plans" title="Goals">
-        <Placeholder>
-          Mexico prep is active. Connect Supabase to create persistent shared
-          goals with your partner.
-        </Placeholder>
-      </Screen>
-    );
+  const data = useCoupleData();
+  const demo = useDemo();
+  const goals = isDemo
+    ? [
+        {
+          id: 'mexico',
+          title: 'Mexico, here we come',
+          description: 'Travel · 62% complete',
+          owner_type: 'shared',
+          owner_user_id: null,
+          target_value: 100,
+        },
+        {
+          id: 'spanish',
+          title: 'Practice Spanish',
+          description: 'Learning · 67% complete',
+          owner_type: 'user',
+          owner_user_id: 'taylor',
+          target_value: 3,
+        },
+      ]
+    : data.goals;
+  const shared = goals.filter((g) => g.owner_type === 'shared');
+  const personal = goals.filter((g) => g.owner_type !== 'shared');
+  const progress = (id: string, target: number | null) =>
+    isDemo
+      ? id === 'mexico'
+        ? 62
+        : 67
+      : Math.min(
+          100,
+          (data.checkIns
+            .filter((c) => c.goal_id === id)
+            .reduce((n, c) => n + Number(c.value), 0) /
+            Number(target || 1)) *
+            100,
+        );
   return (
-    <Screen eyebrow="Our plans" title="Goals">
-      {goals.length ? (
-        goals.map((goal) => (
-          <Pressable
-            key={goal.id}
-            style={styles.card}
-            onPress={() => router.push(`/goals/${goal.id}`)}
-          >
-            <Text style={styles.type}>{goal.goal_type.replace('_', ' ')}</Text>
-            <Text style={styles.title}>{goal.title}</Text>
-            <Text style={styles.copy}>
-              {goal.description || `${goal.owner_type} · ${goal.status}`}
-            </Text>
-          </Pressable>
+    <AppScreen
+      eyebrow={isDemo ? 'Demo · saved locally' : 'Connected'}
+      title="Goals"
+    >
+      <Text style={s.intro}>
+        Everything you are building together, with personal commitments kept in
+        the same shared picture.
+      </Text>
+      <SectionHeader title="Shared goals" action={`${shared.length} active`} />
+      {shared.length ? (
+        shared.map((g) => (
+          <GoalCard
+            key={g.id}
+            title={g.title}
+            subtitle={g.description || 'Shared goal'}
+            progress={progress(g.id, g.target_value)}
+            owner="Both"
+            onPress={() => !isDemo && router.push(`/goals/${g.id}`)}
+          />
         ))
       ) : (
-        <Placeholder>
-          Your first shared goal can be anything meaningful to the two of you.
-        </Placeholder>
+        <EmptyState
+          title="Build something together"
+          body="Create a shared outcome and choose the small actions that move it forward."
+        />
       )}
-      <Pressable
-        onPress={() => router.push('/goals/new')}
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>＋ Create a goal</Text>
-      </Pressable>
-    </Screen>
+      <SectionHeader
+        title="Personal contributions"
+        action={`${personal.length} active`}
+      />
+      {personal.length ? (
+        personal.map((g) => (
+          <GoalCard
+            key={g.id}
+            title={g.title}
+            subtitle={g.description || 'Visible to both partners'}
+            progress={progress(g.id, g.target_value)}
+            owner={
+              isDemo
+                ? 'Taylor'
+                : (data.members.find((m) => m.user_id === g.owner_user_id)
+                    ?.profiles?.display_name ?? 'Partner')
+            }
+            onPress={() => !isDemo && router.push(`/goals/${g.id}`)}
+          />
+        ))
+      ) : (
+        <EmptyState
+          title="No personal goals yet"
+          body="Personal commitments can still contribute to your shared momentum."
+        />
+      )}
+      <View style={s.footer}>
+        <PrimaryButton
+          label="Create a goal"
+          onPress={() => router.push('/goals/new')}
+        />
+      </View>
+    </AppScreen>
   );
 }
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.lg,
+const s = StyleSheet.create({
+  intro: {
+    ...type.body,
+    color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
-  type: {
-    color: colors.raspberry,
-    textTransform: 'uppercase',
-    fontWeight: '900',
-    fontSize: 10,
-  },
-  title: {
-    color: colors.plum,
-    fontWeight: '800',
-    fontSize: 19,
-    marginVertical: 5,
-  },
-  copy: { color: colors.mutedPlum },
-  button: {
-    backgroundColor: colors.raspberry,
-    borderRadius: radius.md,
-    padding: 17,
-    alignItems: 'center',
-    marginTop: spacing.lg,
-  },
-  buttonText: { color: 'white', fontWeight: '900' },
+  footer: { marginTop: spacing.lg },
 });

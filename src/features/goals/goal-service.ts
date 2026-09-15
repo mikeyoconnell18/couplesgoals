@@ -37,6 +37,16 @@ export async function createGoal(draft: GoalDraft, userId: string) {
     .select()
     .single();
   if (error) throw error;
+  await client()
+    .from('activity_events')
+    .insert({
+      couple_id: draft.coupleId,
+      actor_user_id: userId,
+      event_type: 'goal_created',
+      entity_type: 'goal',
+      entity_id: data.id,
+      summary: `Created ${draft.title}`,
+    });
   return data;
 }
 export async function updateGoal(
@@ -65,6 +75,8 @@ export async function addAction(
     cadence: 'daily' | 'weekdays' | 'weekly' | 'once';
     target: number;
     assignedUserId?: string;
+    accountabilityUserId?: string;
+    participationMode?: 'individual' | 'joint' | 'parallel';
     startDate: string;
   },
 ) {
@@ -75,7 +87,14 @@ export async function addAction(
       title: input.title,
       cadence_type: input.cadence,
       target_value: input.target,
-      assigned_user_id: input.assignedUserId,
+      assigned_user_id:
+        input.participationMode === 'individual'
+          ? input.assignedUserId
+          : undefined,
+      accountability_user_id: input.accountabilityUserId,
+      participation_mode:
+        input.participationMode ??
+        (input.assignedUserId ? 'individual' : 'joint'),
       start_date: input.startDate,
       metric_type: input.target === 1 ? 'boolean' : 'count',
     })
