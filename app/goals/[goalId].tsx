@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   },
   secondaryText: { color: colors.raspberry, fontWeight: '800' },
   delete: {
-    color: colors.raspberryDark,
+    color: colors.raspberry,
     textAlign: 'center',
     marginTop: spacing.lg,
     fontWeight: '700',

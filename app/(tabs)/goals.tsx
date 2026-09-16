@@ -9,12 +9,10 @@ import {
 } from '@/components/ui';
 import { useAuth } from '@/features/auth/auth-context';
 import { useCoupleData } from '@/features/data/couple-data-context';
-import { useDemo } from '@/features/demo/demo-context';
 import { colors, spacing, type } from '@/theme/tokens';
 export default function Goals() {
   const { isDemo } = useAuth();
   const data = useCoupleData();
-  const demo = useDemo();
   const goals = isDemo
     ? [
         {
