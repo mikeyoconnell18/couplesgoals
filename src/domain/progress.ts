@@ -9,6 +9,7 @@ export type ProgressCommitment = {
   participation: ParticipationMode;
   assignedUserId?: string | null;
   participantUserIds?: string[];
+  cumulative?: boolean;
 };
 
 export type ProgressLog = {
@@ -58,6 +59,7 @@ export function buildProgressSeries(
     memberIds.map((id) => [id, [] as number[]]),
   );
   const joint: number[] = [];
+  const periodStart = dates[0];
   for (const date of dates) {
     const personalValues: Record<string, number[]> = Object.fromEntries(
       memberIds.map((id) => [id, []]),
@@ -65,7 +67,10 @@ export function buildProgressSeries(
     const jointValues: number[] = [];
     for (const action of commitments) {
       const throughDate = logs.filter(
-        (log) => log.actionId === action.id && log.localDate <= date,
+        (log) =>
+          log.actionId === action.id &&
+          (action.cumulative || !periodStart || log.localDate >= periodStart) &&
+          log.localDate <= date,
       );
       if (action.participation === 'joint') {
         jointValues.push(
@@ -108,8 +113,30 @@ export function paceForDay(dayIndex: number, dayCount = 7) {
   return Math.round(Math.min(Math.max((dayIndex + 1) / dayCount, 0), 1) * 100);
 }
 
-export function weekDates(now = new Date()) {
-  const start = new Date(now);
+export function applicablePeriodTarget(
+  cadence: string,
+  target: number,
+  dates: string[],
+  selectedWeekdays: number[] = [],
+) {
+  if (cadence === 'daily') return target * dates.length;
+  if (cadence === 'weekdays') {
+    const occurrences = dates.filter((date) =>
+      selectedWeekdays.includes(new Date(`${date}T12:00:00Z`).getUTCDay()),
+    ).length;
+    return target * occurrences;
+  }
+  return target;
+}
+
+export function weekDates(now = new Date(), timeZone = 'UTC') {
+  const localDate = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(now);
+  const start = new Date(`${localDate}T12:00:00Z`);
   const mondayOffset = (start.getDay() + 6) % 7;
   start.setDate(start.getDate() - mondayOffset);
   return Array.from({ length: 7 }, (_, index) => {

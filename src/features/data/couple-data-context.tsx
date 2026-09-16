@@ -47,6 +47,9 @@ export type ActionRecord = {
   title: string;
   assigned_user_id: string | null;
   cadence_type: string;
+  selected_weekdays: number[] | null;
+  start_date: string;
+  end_date: string | null;
   target_value: number;
   metric_type: string;
   participation_mode: 'individual' | 'joint' | 'parallel';

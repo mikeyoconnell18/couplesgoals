@@ -71,6 +71,13 @@ function DemoTogether() {
       {activities.map((item) => (
         <ActivityCard
           key={item.id}
+          accentColor={
+            item.author === 'Together'
+              ? colors.coral
+              : item.author === 'Taylor'
+                ? colors.raspberry
+                : colors.primary
+          }
           title={`${item.author} · ${item.time}`}
           body={item.title}
           footer={
@@ -123,7 +130,14 @@ function ConnectedTogether() {
   const name = (id: string | null) =>
     data.members.find((m) => m.user_id === id)?.profiles?.display_name ??
     'Partner';
-  const current = data.members.slice(0, 2).map((member) => ({
+  const orderedMembers = [...data.members].sort((a, b) =>
+    a.user_id === session?.user.id
+      ? -1
+      : b.user_id === session?.user.id
+        ? 1
+        : a.user_id.localeCompare(b.user_id),
+  );
+  const current = orderedMembers.slice(0, 2).map((member) => ({
     member,
     action: data.actions.find(
       (a) =>
@@ -171,6 +185,11 @@ function ConnectedTogether() {
         data.events.map((event) => (
           <ActivityCard
             key={event.id}
+            accentColor={
+              event.actor_user_id === session?.user.id
+                ? colors.primary
+                : colors.raspberry
+            }
             onPress={() => router.push(`/activity/${event.id}`)}
             title={`${name(event.actor_user_id)} · ${relative(event.occurred_at)}`}
             body={event.summary}

@@ -12,6 +12,7 @@ import {
   TextInputProps,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, radius, spacing, type } from '@/theme/tokens';
 
 export function AppScreen({
@@ -24,6 +25,7 @@ export function AppScreen({
   eyebrow?: string;
   header?: ReactNode;
 }>) {
+  const insets = useSafeAreaInsets();
   return (
     <KeyboardAvoidingView
       style={s.flex}
@@ -32,7 +34,10 @@ export function AppScreen({
       <ScrollView
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={s.screen}
+        contentContainerStyle={[
+          s.screen,
+          { paddingTop: Math.max(insets.top, spacing.sm) },
+        ]}
       >
         {header}
         {eyebrow ? <Text style={s.eyebrow}>{eyebrow}</Text> : null}
@@ -388,17 +393,27 @@ export function ActivityCard({
   body,
   footer,
   onPress,
+  accentColor,
 }: {
   title: string;
   body: string;
   footer?: ReactNode;
   onPress?: () => void;
+  accentColor?: string;
 }) {
   return (
     <Pressable
       disabled={!onPress}
       onPress={onPress}
-      style={({ pressed }) => [s.activity, pressed && s.cardPressed]}
+      style={({ pressed }) => [
+        s.activity,
+        accentColor && {
+          borderLeftWidth: 3,
+          borderLeftColor: accentColor,
+          paddingLeft: spacing.sm,
+        },
+        pressed && s.cardPressed,
+      ]}
     >
       <Text style={s.cardTitle}>{title}</Text>
       <Text style={s.support}>{body}</Text>

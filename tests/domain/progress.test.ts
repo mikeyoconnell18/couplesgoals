@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   buildProgressSeries,
+  applicablePeriodTarget,
   normalizeProgress,
   paceForDay,
 } from '../../src/domain/progress.ts';
@@ -81,4 +82,40 @@ test('pace is the expected cumulative share of a period', () => {
   assert.equal(paceForDay(0), 14);
   assert.equal(paceForDay(3), 57);
   assert.equal(paceForDay(6), 100);
+});
+
+test('weekly series excludes check-ins before the displayed period', () => {
+  const result = buildProgressSeries(
+    [
+      {
+        id: 'a',
+        metric: 'count',
+        target: 2,
+        participation: 'individual',
+        assignedUserId: 'me',
+      },
+    ],
+    [
+      { actionId: 'a', userId: 'me', value: 2, localDate: '2026-09-13' },
+      { actionId: 'a', userId: 'me', value: 1, localDate: '2026-09-14' },
+    ],
+    ['2026-09-14'],
+    ['me'],
+  );
+  assert.deepEqual(result.personal.me, [50]);
+});
+
+test('applicable targets account for recurring expected occurrences', () => {
+  const week = [
+    '2026-09-14',
+    '2026-09-15',
+    '2026-09-16',
+    '2026-09-17',
+    '2026-09-18',
+    '2026-09-19',
+    '2026-09-20',
+  ];
+  assert.equal(applicablePeriodTarget('daily', 2, week), 14);
+  assert.equal(applicablePeriodTarget('weekdays', 1, week, [1, 3, 5]), 3);
+  assert.equal(applicablePeriodTarget('weekly', 4, week), 4);
 });

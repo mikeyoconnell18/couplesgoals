@@ -16,10 +16,12 @@ import {
 import { WeekProgressChart } from '@/components/week-progress-chart';
 import {
   buildProgressSeries,
+  applicablePeriodTarget,
   paceForDay,
   weekDates,
   type MetricType,
 } from '@/domain/progress';
+import { isActionDue, type Cadence } from '@/domain/recurrence';
 import { useAuth } from '@/features/auth/auth-context';
 import { logCheckIn } from '@/features/check-ins/check-in-service';
 import { setReaction } from '@/features/connected/connected-service';
@@ -70,12 +72,16 @@ function ActionItem({
   detail,
   owner,
   complete,
+  progress,
+  color,
   onLog,
 }: {
   title: string;
   detail: string;
   owner: string;
   complete: boolean;
+  progress: number;
+  color: string;
   onLog: () => void;
 }) {
   return (
@@ -84,9 +90,23 @@ function ActionItem({
         <Text numberOfLines={1} style={s.actionTitle}>
           {title}
         </Text>
-        <Text numberOfLines={1} style={s.meta}>
-          {owner} · {detail}
-        </Text>
+        <View style={s.ownerRow}>
+          <View style={[s.ownerDot, { backgroundColor: color }]} />
+          <Text numberOfLines={1} style={s.meta}>
+            {owner} · {detail}
+          </Text>
+        </View>
+        <View style={s.actionTrack}>
+          <View
+            style={[
+              s.actionProgress,
+              {
+                width: `${Math.min(Math.max(progress, 0), 100)}%`,
+                backgroundColor: color,
+              },
+            ]}
+          />
+        </View>
       </View>
       <Pressable
         accessibilityRole="button"
@@ -117,10 +137,12 @@ function Attention({ text, route }: { text: string; route: string }) {
 function Activity({
   author,
   summary,
+  time,
   onReact,
 }: {
   author: string;
   summary: string;
+  time: string;
   onReact: () => void;
 }) {
   return (
@@ -129,7 +151,7 @@ function Activity({
       <View style={s.activityCopy}>
         <Text style={s.activityAuthor}>{author}</Text>
         <Text numberOfLines={2} style={s.meta}>
-          {summary}
+          {summary} · {time}
         </Text>
       </View>
       <Pressable
@@ -179,14 +201,15 @@ function DemoToday() {
   const mine = Math.round((current[2] + current[3]) / 2),
     partner = Math.round((current[0] + current[3]) / 2),
     joint = Math.round((current[1] + current[4]) / 2);
-  const latest = activities[0];
+  const latest = activities.find((item) => item.author === 'Taylor');
   const todayActions = actions.slice(0, 3);
   return (
     <AppScreen header={<Header names={names} unread={unread} />}>
       <WeekProgressChart
         series={chartSeries([ramp(mine), ramp(partner), ramp(joint)], names)}
         pace={Array.from({ length: 7 }, (_, i) => paceForDay(i))}
-        summary={`Together: ${joint}% · ${joint >= paceForDay(new Date().getDay() ? new Date().getDay() - 1 : 6) ? 'On pace' : 'Behind pace'}`}
+        currentDay={(new Date().getDay() + 6) % 7}
+        summary={`Weekly actions: ${joint}% · ${joint >= paceForDay((new Date().getDay() + 6) % 7) ? 'on pace' : 'behind pace'}`}
       />
       {lastLogged ? (
         <Banner>
@@ -208,6 +231,14 @@ function DemoToday() {
             owner={action.assignee}
             detail={action.detail}
             complete={action.value >= action.target}
+            progress={(action.value / action.target) * 100}
+            color={
+              action.participation === 'joint'
+                ? colors.coral
+                : action.assignee.includes('Taylor')
+                  ? colors.raspberry
+                  : colors.primary
+            }
             onLog={() =>
               action.metric === 'boolean'
                 ? logAction(action.id)
@@ -217,7 +248,7 @@ function DemoToday() {
         ))}
       </View>
       <Attention
-        text="Mexico goal is a little behind this week. See the next milestone."
+        text="Mexico savings: behind target — review the next milestone."
         route="/goals/mexico"
       />
       <SectionHeader
@@ -229,6 +260,7 @@ function DemoToday() {
         <Activity
           author={latest.author}
           summary={latest.title}
+          time={latest.time}
           onReact={() => react(latest.id, '❤️')}
         />
       ) : null}
@@ -273,17 +305,26 @@ function ConnectedToday() {
     [data.members, session?.user.id],
   );
   const names = ordered.map((m) => m.profiles?.display_name ?? 'Partner');
-  const dates = useMemo(() => weekDates(), []);
+  const dates = useMemo(
+    () => weekDates(new Date(), data.couple?.timezone ?? 'UTC'),
+    [data.couple?.timezone],
+  );
   const series = useMemo(
     () =>
       buildProgressSeries(
         data.actions.map((a) => ({
           id: a.id,
           metric: metric(a.metric_type),
-          target: Number(a.target_value),
+          target: applicablePeriodTarget(
+            a.cadence_type,
+            Number(a.target_value),
+            dates,
+            a.selected_weekdays ?? [],
+          ),
           participation: a.participation_mode,
           assignedUserId: a.assigned_user_id,
           participantUserIds: data.members.map((m) => m.user_id),
+          cumulative: a.cadence_type === 'total' || a.cadence_type === 'once',
         })),
         data.checkIns.map((c) => ({
           actionId: c.action_id,
@@ -309,15 +350,29 @@ function ConnectedToday() {
         <PrimaryButton label="Try again" onPress={() => void data.refresh()} />
       </AppScreen>
     );
-  const day = Math.min(
-    Math.max(dates.indexOf(new Date().toISOString().slice(0, 10)), 0),
-    6,
-  );
+  const today = dateKey(new Date(), data.couple?.timezone ?? 'UTC');
+  const day = Math.min(Math.max(dates.indexOf(today), 0), 6);
   const joint = series.joint[day] ?? 0;
-  const progress = (id: string) =>
-    data.checkIns
-      .filter((c) => c.action_id === id)
+  const progress = (id: string) => {
+    const action = data.actions.find((item) => item.id === id);
+    const periodStart =
+      action?.cadence_type === 'daily' || action?.cadence_type === 'weekdays'
+        ? today
+        : action?.cadence_type === 'weekly'
+          ? dates[0]
+          : action?.cadence_type === 'monthly'
+            ? `${today.slice(0, 7)}-01`
+            : action?.start_date;
+    return data.checkIns
+      .filter(
+        (c) =>
+          c.action_id === id &&
+          (action?.participation_mode !== 'parallel' ||
+            c.user_id === session?.user.id) &&
+          (!periodStart || c.effective_local_date >= periodStart),
+      )
       .reduce((n, c) => n + Number(c.value), 0);
+  };
   async function log(id: string, amount: number) {
     const action = data.actions.find((a) => a.id === id);
     if (!session || !data.couple || !action) return;
@@ -336,9 +391,29 @@ function ConnectedToday() {
     });
     await data.refresh();
   }
-  const latest = data.events[0];
+  const latest = data.events.find(
+    (event) => event.actor_user_id !== session?.user.id,
+  );
   const obligation = data.obligations[0];
-  const actions = data.actions.slice(0, 3);
+  const actions = data.actions
+    .filter(
+      (action) =>
+        (action.participation_mode === 'joint' ||
+          action.participation_mode === 'parallel' ||
+          !action.assigned_user_id ||
+          action.assigned_user_id === session?.user.id) &&
+        isActionDue(
+          {
+            cadence: action.cadence_type as Cadence,
+            selectedWeekdays: action.selected_weekdays ?? undefined,
+            startDate: action.start_date,
+            endDate: action.end_date ?? undefined,
+          },
+          new Date(),
+          data.couple?.timezone ?? 'UTC',
+        ),
+    )
+    .slice(0, 3);
   return (
     <AppScreen
       header={
@@ -358,7 +433,8 @@ function ConnectedToday() {
           names,
         )}
         pace={Array.from({ length: 7 }, (_, i) => paceForDay(i))}
-        summary={`Together: ${joint}% · ${joint >= paceForDay(day) ? 'On pace' : 'Behind pace'}`}
+        currentDay={day}
+        summary={`Weekly actions: ${joint}% · ${joint >= paceForDay(day) ? 'on pace' : 'behind pace'}`}
       />
       <SectionHeader title="Today’s actions" action={`${actions.length} due`} />
       <View style={s.actionGroup}>
@@ -380,6 +456,14 @@ function ConnectedToday() {
               }
               detail={`${amount} of ${action.target_value}`}
               complete={done}
+              progress={(amount / Number(action.target_value || 1)) * 100}
+              color={
+                action.participation_mode === 'joint'
+                  ? colors.coral
+                  : action.assigned_user_id === ordered[1]?.user_id
+                    ? colors.raspberry
+                    : colors.primary
+              }
               onLog={() =>
                 action.metric_type === 'boolean'
                   ? void log(action.id, 1)
@@ -393,7 +477,7 @@ function ConnectedToday() {
         text={
           obligation
             ? obligation.title
-            : `${data.goals[0]?.title ?? 'A shared goal'} is ${joint >= paceForDay(day) ? 'on pace' : 'falling behind pace'}.`
+            : `${data.goals[0]?.title ?? 'Shared goal'}: review cumulative target progress.`
         }
         route={
           obligation
@@ -415,6 +499,7 @@ function ConnectedToday() {
               ?.profiles?.display_name ?? 'Partner'
           }
           summary={latest.summary}
+          time={relative(latest.occurred_at)}
           onReact={() =>
             session &&
             data.couple &&
@@ -460,6 +545,25 @@ function metric(value: string): MetricType {
     ? (value as MetricType)
     : 'custom';
 }
+function dateKey(date: Date, timeZone: string) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date);
+}
+function relative(value: string) {
+  const minutes = Math.max(
+    1,
+    Math.round((Date.now() - new Date(value).getTime()) / 60000),
+  );
+  return minutes < 60
+    ? `${minutes}m ago`
+    : minutes < 1440
+      ? `${Math.round(minutes / 60)}h ago`
+      : `${Math.round(minutes / 1440)}d ago`;
+}
 const s = StyleSheet.create({
   header: {
     flexDirection: 'row',
@@ -493,6 +597,15 @@ const s = StyleSheet.create({
   },
   complete: { opacity: 0.56 },
   actionCopy: { flex: 1 },
+  ownerRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  ownerDot: { width: 7, height: 7, borderRadius: 4 },
+  actionTrack: {
+    height: 2,
+    backgroundColor: colors.border,
+    marginTop: 5,
+    marginRight: spacing.md,
+  },
+  actionProgress: { height: 2, borderRadius: 1 },
   actionTitle: { ...type.card, color: colors.ink },
   meta: { ...type.support, color: colors.textSecondary },
   logButton: {
@@ -501,26 +614,31 @@ const s = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.primarySoft,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   logDone: { backgroundColor: colors.primary },
   attention: {
     marginTop: spacing.md,
-    minHeight: 60,
+    minHeight: 52,
     borderRadius: radius.md,
-    backgroundColor: '#FFF4EF',
+    backgroundColor: colors.ink,
     padding: spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
   },
   attentionLabel: { ...type.label, color: colors.coral, fontSize: 10 },
-  attentionText: { ...type.support, color: colors.ink, flex: 1 },
+  attentionText: { ...type.support, color: colors.surface, flex: 1 },
   activity: {
     minHeight: 60,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.md,
+    backgroundColor: colors.raspberrySoft,
   },
   activityCopy: { flex: 1 },
   activityAuthor: { ...type.label, color: colors.raspberry },
